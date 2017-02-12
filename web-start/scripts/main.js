@@ -37,6 +37,7 @@ function FriendlyChat() {
   this.initFirebase();
 
   this.startChat();
+  this.loadMessages();
 }
 
 // Sets up shortcuts to Firebase features and initiate firebase auth.
@@ -62,7 +63,7 @@ FriendlyChat.prototype.startChat = function() {
   var botName = "Fem Health Bot";
   var msg = "Hi, I'm here to help connect you with doctors and resources. "
   + 'Try searching for resource categories such as "abortion", "birth control"'
-  + ', "IUD", "sterilization", "sex positive gynecologist", "sex change", "hair loss", "infertility';
+  + ', "IUD", "sterilization", "sex positive gynecologist", "sex change", "hair loss", "infertility"';
   this.messageRef = this.chatRef.push({
     name: botName,
     text: msg,

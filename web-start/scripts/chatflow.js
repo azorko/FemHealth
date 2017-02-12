@@ -52,10 +52,10 @@ ChatFlow.prototype.chooseResourceFlow = function(entities) {
 };
 
 
-ChatFlow.prototype.finalizeResourceFlow = function() {
-  while ()
-};
+// ChatFlow.prototype.finalizeResourceFlow = function() {
+//   while ()
+// };
 
-ChatFlow.prototype.runFlow = function() {
-  while ()
-};
+// ChatFlow.prototype.runFlow = function() {
+//   while ()
+// };
