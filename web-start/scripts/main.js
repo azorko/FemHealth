@@ -1,6 +1,6 @@
 'use strict';
 
-// Initializes FriendlyChat.
+// Initializes FriendlyChat. Called on every page load.
 function FriendlyChat() {
   this.checkSetup();
 
@@ -35,6 +35,23 @@ function FriendlyChat() {
   this.mediaCapture.addEventListener('change', this.saveImageMessage.bind(this));
 
   this.initFirebase();
+
+  // Create highest-level reference to all chat rooms
+  this.chatRoomsRef = this.database.ref('chatRooms');
+
+  // Create a new chat room within the DB for current session
+  this.chatRef = this.chatRoomsRef.push();
+  console.log(this.chatRef);
+
+  // Load starter message with chat room initiation
+  var botName = "Fem Health Bot";
+  var initMsg = "Hi, I'm here to help connect you with doctors and resources. "
+  + "You can type something like: 'abortion', 'birth control', 'gynocologist', etc.";
+  this.messageRef = this.chatRef.push({
+    name: botName,
+    text: initMsg,
+    photoUrl: '/images/profile_placeholder.png'
+  });
 }
 
 // Sets up shortcuts to Firebase features and initiate firebase auth.
@@ -49,18 +66,16 @@ FriendlyChat.prototype.initFirebase = function() {
 
 // Loads chat messages history and listens for upcoming ones.
 FriendlyChat.prototype.loadMessages = function() {
-  // Reference to the /messages/ database path.
-  this.messagesRef = this.database.ref('messages');
   // Make sure we remove all previous listeners.
-  this.messagesRef.off();
+  this.chatRef.off();
 
   // Loads the last 12 messages and listen for new ones.
   var setMessage = function(data) {
     var val = data.val();
     this.displayMessage(data.key, val.name, val.text, val.photoUrl, val.imageUrl);
   }.bind(this);
-  this.messagesRef.limitToLast(12).on('child_added', setMessage);
-  this.messagesRef.limitToLast(12).on('child_changed', setMessage);
+  this.chatRef.limitToLast(12).on('child_added', setMessage);
+  this.chatRef.limitToLast(12).on('child_changed', setMessage);
 };
 
 // Saves a new message on the Firebase DB.
@@ -70,7 +85,7 @@ FriendlyChat.prototype.saveMessage = function(e) {
   if (this.messageInput.value && this.checkSignedInWithMessage()) {
     var currentUser = this.auth.currentUser;
     // Add a new message entry to the Firebase Database.
-    this.messagesRef.push({
+    this.chatRef.push({
       name: currentUser.displayName,
       text: this.messageInput.value,
       photoUrl: currentUser.photoURL || '/images/profile_placeholder.png'
@@ -120,7 +135,7 @@ FriendlyChat.prototype.saveImageMessage = function(event) {
 
     // We add a message with a loading icon that will get updated with the shared image.
     var currentUser = this.auth.currentUser;
-    this.messagesRef.push({
+    this.chatRef.push({
       name: currentUser.displayName,
       imageUrl: FriendlyChat.LOADING_IMAGE_URL,
       photoUrl: currentUser.photoURL || '/images/profile_placeholder.png'
