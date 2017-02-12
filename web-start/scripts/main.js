@@ -36,22 +36,7 @@ function FriendlyChat() {
 
   this.initFirebase();
 
-  // Create highest-level reference to all chat rooms
-  this.chatRoomsRef = this.database.ref('chatRooms');
-
-  // Create a new chat room within the DB for current session
-  this.chatRef = this.chatRoomsRef.push();
-  console.log(this.chatRef);
-
-  // Load starter message with chat room initiation
-  var botName = "Fem Health Bot";
-  var initMsg = "Hi, I'm here to help connect you with doctors and resources. "
-  + "You can type something like: 'abortion', 'birth control', 'gynocologist', etc.";
-  this.messageRef = this.chatRef.push({
-    name: botName,
-    text: initMsg,
-    photoUrl: '/images/profile_placeholder.png'
-  });
+  this.startChat();
 }
 
 // Sets up shortcuts to Firebase features and initiate firebase auth.
@@ -63,6 +48,32 @@ FriendlyChat.prototype.initFirebase = function() {
   // Initiates Firebase auth and listen to auth state changes.
   this.auth.onAuthStateChanged(this.onAuthStateChanged.bind(this));
 };
+
+// Start a new chat room
+FriendlyChat.prototype.startChat = function() {
+  // Create highest-level reference to all chat rooms
+  this.chatRoomsRef = this.database.ref('chatRooms');
+
+  // Create a new chat room within the DB for current session
+  this.chatRef = this.chatRoomsRef.push();
+  console.log(this.chatRef);
+
+  // Load starter messages with chat room initiation
+  var botName = "Fem Health Bot";
+  var msg = "Hi, I'm here to help connect you with doctors and resources. "
+  + "You can type something like: 'abortion', 'birth control', 'gynocologist', etc.";
+  this.messageRef = this.chatRef.push({
+    name: botName,
+    text: msg,
+    photoUrl: '/images/women-health-symbol.jpg'
+  });
+  msg = "You can also type 'help' for a list of resource types available.";
+  this.messageRef = this.chatRef.push({
+    name: botName,
+    text: msg,
+    photoUrl: '/images/women-health-symbol.jpg'
+  });
+}
 
 // Loads chat messages history and listens for upcoming ones.
 FriendlyChat.prototype.loadMessages = function() {
