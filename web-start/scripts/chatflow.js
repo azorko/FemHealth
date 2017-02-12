@@ -1,48 +1,61 @@
 'use strict';
 
-function ChatFlow() {
-  this.resourceTypes = new Map([
+function ChatFlow(chatRef) {
+  // constants
+  this.chatRef = chatRef;
+  this.flowFinalized = false;
+
+  this.patterns = new Map([
     ['abortion', ['abortion', 'termination', 'feticide', 'aborticide']],
-    ['birth control', ['pill', 'contraception', 'IUD']],
-    ['sex positive gynocologist', ['gynocologist', 'vagina', 'STD', 'HPV']],
+    ['birth control', ['pill', 'contraception']],
+    ['IUD', ['IUD', 'contraception']],
+    ['gynecologist', ['gynecologist', 'vagina', 'STD', 'HPV']],
     ['sex change', ['transgender', 'sex', 'change', 'reassignment', 'hormone', 'estrogen', 'testosterone']],
-    ['help', ['help']], // print out our resourceTypes in next message
     ['hair loss', ['balding', 'hair', 'alopecia']],
     ['infertility', ['infertility', 'reproduction', 'baby', 'IVF', 'egg', 'freeze']],
     ['menopause', ['menopause', 'hormone', 'estrogen', 'hot', 'flash']],
+    ['sterilization', ['sterilization', 'contraception']],
   ]);
 }
 
-// Start chat by sending intro:
-// "Hi, I'm here to help connect you with doctors and resources. You can type something like: 'abortion', 'birth control', 'gynocologist', etc."
-// "You can also type 'help' for a list of resource types available."
+// @param !String question
+ChatFlow.prototype.sendChatbotMsg = function(message) {
+  this.chatRef.push({
+    name: BOT_NAME,
+    text: message,
+    photoUrl: BOT_IMAGE_URL,
+  });
+};
 
 // @param !Object<String> entities The main words found by natural lang algo.
-// @return !String The winning resourceType.
-ChatFlow.prototype.chooseResponse = function (entities) {
+// @return ?String The winning pattern.
+ChatFlow.prototype.chooseResourceFlow = function(entities) {
   var scores = {};
   for (let entity of entities) {
-    for (let [resourceType, synonyms] of this.resourceTypes) {
+    for (let [pattern, synonyms] of this.patterns) {
       if (synonyms.includes(entity)) {
-        scores[resourceType] ? scores[resourceType]++ : scores[resourceType] = 1;
+        scores[pattern] ? scores[pattern]++ : scores[pattern] = 1;
       }
     }
   }
-  // Could be a tie for top score, give a not sure answer then.
-  scores = Object.keys(scores).reduce((a, b) => {
+  // Could be a tie for top score, give a no match answer then.
+  var patternMatch = Object.keys(scores).reduce((a, b) => {
     if (scores[a] > scores[b]) {
       return a;
     } else if (scores[a] === scores[b]) {
-      return 'tie';
+      return 'no match';
     } else {
       return b;
     }
   });
-  if (scores === 'tie') {
-    return 'not sure';
-  }
-  return scores;
+  return patternMatch;
 };
 
-var cf = new ChatFlow();
-console.log(cf.chooseResponse(['estrogen', 'menopause']));
+
+ChatFlow.prototype.finalizeResourceFlow = function() {
+  while ()
+};
+
+ChatFlow.prototype.runFlow = function() {
+  while ()
+};

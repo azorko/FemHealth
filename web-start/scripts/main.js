@@ -61,7 +61,8 @@ FriendlyChat.prototype.startChat = function() {
   // Load starter messages with chat room initiation
   var botName = "Fem Health Bot";
   var msg = "Hi, I'm here to help connect you with doctors and resources. "
-  + "You can type something like: 'abortion', 'birth control', 'gynocologist', etc.";
+  + 'Try searching for resource categories such as "abortion", "birth control"'
+  + ', "IUD", "sterilization", "sex positive gynecologist", "sex change", "hair loss", "infertility';
   this.messageRef = this.chatRef.push({
     name: botName,
     text: msg,
@@ -73,6 +74,8 @@ FriendlyChat.prototype.startChat = function() {
     text: msg,
     photoUrl: '/images/women-health-symbol.jpg'
   });
+  var chatFlow = new ChatFlow(this.chatRef);
+  chatFlow.chooseResourceFlow(['estrogen', 'abortion']);
 }
 
 // Loads chat messages history and listens for upcoming ones.
