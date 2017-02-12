@@ -6,9 +6,6 @@ var DoctorQuery = require("./DoctorQuery");
 
 var doctorQuery = new DoctorQuery(DOCTOR_API, GOOGLE_PLACES_OUTPUT_FORMAT);
 
-var parameters = {
-    user_location: "29.766083,\ -95.358810",
-};
 
 // var db_print = {
 // 	doctors : [{
@@ -41,10 +38,16 @@ function toInsurances(insurance) {
 	return resp
 }
 
-var doctors = []
-var latlngs = {}
-doctorQuery(parameters, function (error, response) {
-    if (error) throw error;
+function randomDollars() {
+	var dollarReturn = "$"; 
+	for (var i = 0; i < Math.floor((Math.random() * 5)); i++){
+		dollarReturn += "$";
+	}
+	return dollarReturn;
+}
+
+
+function processResponseData(response) { 
 	for (i in response.data) {
 		doctors.push({
 			'id': response.data[i].uid, 
@@ -56,7 +59,8 @@ doctorQuery(parameters, function (error, response) {
 			'phone': response.data[i].practices[0].phones[0].number,
 			'gender': response.data[i].profile.gender,
 			'languages': toLanguage(response.data[i].profile.languages),
-			'insurance': toInsurances(response.data[i].insurances)
+			'insurance': toInsurances(response.data[i].insurances), 
+			'price_rating': randomDollars(),
 		}); 
 		latlongString = response.data[i].practices[0].lat + ", " + response.data[i].practices[0].lon;
 		latlongString = latlongString.replace(/\./g, '_');
@@ -66,5 +70,25 @@ doctorQuery(parameters, function (error, response) {
 			latlngs[latlongString] = [{'id': response.data[i].uid}];
 		}
 	}
-	console.log(JSON.stringify({'doctors': doctors, 'latlngs': latlngs}))
-});
+}
+
+var doctors = [];
+var latlngs = {};
+var specialties = ['gynecologist', 'obstetrician', 'endocrinologist', 'dermatologist'];
+
+for (var i in specialties) {
+	var parameters = {
+    	user_location: "29.766083,\ -95.358810",
+		specialty_uid: specialties[i]
+	};
+	doctorQuery(parameters, function (error, response) {
+	    if (error) throw error;
+	    setTimeout(function(){
+			processResponseData(response);
+		},500);
+	});
+}
+
+setTimeout(function() {console.log(JSON.stringify({'doctors': doctors, 'latlngs': latlngs}))}, 5000);
+
+
